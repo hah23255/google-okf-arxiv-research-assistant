@@ -1,0 +1,2 @@
+[console_scripts]
+okf-assistant = google_okf_arxiv_assistant.cli:main

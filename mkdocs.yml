@@ -1,0 +1,15 @@
+site_name: Google OKF ArXiv Research Assistant Docs
+site_description: Pure-OKF tutorial and reference docs
+site_author: Ahmad
+
+nav:
+  - Home: docs/index.md
+  - Getting Started: docs/getting_started.md
+  - Architecture: docs/architecture.md
+  - CLI Reference: docs/cli_reference.md
+  - API Reference: docs/api_reference.md
+  - Streamlit Frontend: docs/streamlit_frontend.md
+  - Troubleshooting: docs/troubleshooting.md
+  - Exercises: docs/exercises.md
+  - Notebook-first Path: docs/notebook_path.md
+  - Compatibility Promises: docs/compatibility_promises.md

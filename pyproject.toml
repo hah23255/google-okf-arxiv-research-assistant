@@ -1,0 +1,35 @@
+[project]
+name = "google-okf-arxiv-research-assistant"
+version = "0.1.0"
+description = "OKF-first ArXiv research assistant"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "arxiv>=2.2.0",
+  "fastapi>=0.116.0",
+  "pyyaml>=6.0.2",
+  "streamlit>=1.40.0",
+  "uvicorn>=0.35.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.3.0",
+]
+
+[project.scripts]
+okf-assistant = "google_okf_arxiv_assistant.cli:main"
+
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+addopts = "-q"

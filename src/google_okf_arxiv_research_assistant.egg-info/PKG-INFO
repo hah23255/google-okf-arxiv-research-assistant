@@ -1,0 +1,136 @@
+Metadata-Version: 2.4
+Name: google-okf-arxiv-research-assistant
+Version: 0.1.0
+Summary: OKF-first ArXiv research assistant
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+Requires-Dist: arxiv>=2.2.0
+Requires-Dist: fastapi>=0.116.0
+Requires-Dist: pyyaml>=6.0.2
+Requires-Dist: streamlit>=1.40.0
+Requires-Dist: uvicorn>=0.35.0
+Provides-Extra: dev
+Requires-Dist: pytest>=8.3.0; extra == "dev"
+
+# Google OKF ArXiv Research Assistant
+
+An OKF-first ArXiv assistant that stores knowledge as markdown documents with YAML frontmatter
+and answers questions using deterministic lexical retrieval plus optional local Ollama synthesis.
+
+## Core scope (v1)
+
+- No vector database
+- No RAG pipeline
+- No embedding models
+- Retrieval always stays lexical over local OKF docs
+- Optional additive local model synthesis via `/query-model`
+
+## Prerequisites
+
+- Python `>=3.11`
+- `uv` installed
+
+## Input schema (`produce-jsonl`)
+
+Each line in the JSONL file must contain:
+
+```json
+{
+  "paper_id": "2106.09685",
+  "title": "LoRA: Low-Rank Adaptation of Large Language Models",
+  "abstract": "LoRA adapts large models by injecting trainable low-rank matrices.",
+  "url": "https://arxiv.org/abs/2106.09685",
+  "categories": ["cs.CL", "cs.LG"]
+}
+```
+
+`url` is optional. If missing, it defaults to `https://arxiv.org/abs/{paper_id}`.
+
+## Quickstart
+
+```bash
+uv sync --extra dev
+uv run okf-assistant produce-jsonl --input papers.jsonl --output okf
+uv run okf-assistant validate --bundle okf
+uv run okf-assistant query --bundle okf --question "What is LoRA?"
+uv run uvicorn google_okf_arxiv_assistant.api:app --reload
+uv run streamlit run app.py
+```
+
+## Streamlit frontend
+
+Streamlit is an additive UI layer that calls the existing FastAPI backend.
+
+Backend terminal:
+
+```bash
+uv run uvicorn google_okf_arxiv_assistant.api:app --reload
+```
+
+Frontend terminal:
+
+```bash
+uv run streamlit run app.py
+```
+
+Configuration options for Streamlit:
+
+- Sidebar `API Base URL`
+- Environment variable: `OKF_API_BASE_URL`
+- `.streamlit/secrets.toml` (`api_base_url`) using `.streamlit/secrets.toml.example`
+
+## Expected command outputs
+
+- `produce-jsonl`: logs file creation and writes `index.md` + `concept-*.md` files.
+- `validate`: prints `Validation passed: <bundle_dir>` or per-file issues.
+- `query`: prints:
+  - `Question: ...`
+  - `Evidence summary:`
+  - `Citations: ...`
+
+## API contract
+
+- `GET /health` -> `{ "status": "ok" }`
+- `POST /query` request:
+  - `query: string` (min 3 chars)
+  - `top_k: int` (1..20, default 5)
+- `POST /query` response:
+  - `answer: string`
+  - `citations: string[]`
+
+## Compatibility promises
+
+The project guarantees strict non-breaking compatibility for:
+
+- CLI subcommands and flags:
+  - `produce-jsonl --input --output`
+  - `produce-arxiv --query --limit --output`
+  - `validate --bundle`
+  - `query --bundle --question --top-k`
+- API endpoint shapes for `/health` and `/query`
+
+## Common failure modes
+
+- `Bundle directory not found`:
+  - Fix `--bundle` path or `OKF_BUNDLE_DIR` env var.
+- `Missing frontmatter fence` or parse failures:
+  - Ensure markdown docs start with `---` YAML frontmatter.
+- `index.md must declare frontmatter type=index`:
+  - Ensure reserved filename/type pairing.
+- Streamlit cannot reach backend:
+  - Verify FastAPI is running and `API Base URL` is correct.
+
+## Diagnostics
+
+```bash
+uv run python -m pytest -p no:cacheprovider
+uv run python scripts/check_docs_links.py
+bash scripts/ci_smoke.sh
+```
+
+## Learning docs
+
+- Zero-to-mastery guide: [MASTER_GUIDE.md](MASTER_GUIDE.md)
+- Multi-page tutorial docs: [docs/index.md](docs/index.md)
+- Notebook-first path: [tutorials/notebook_first_tutorial.ipynb](tutorials/notebook_first_tutorial.ipynb)
+- Release assets: [CHANGELOG.md](CHANGELOG.md), [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md)
