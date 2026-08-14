@@ -219,3 +219,5 @@ bash scripts/real_user_run.sh
 - Multi-page tutorial docs: [docs/index.md](docs/index.md)
 - Notebook-first path: [tutorials/notebook_first_tutorial.ipynb](tutorials/notebook_first_tutorial.ipynb)
 - Release assets: [CHANGELOG.md](CHANGELOG.md), [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md)
+
+<p align="center">Made with ❤️ by Ahmad Mujtaba</p>
